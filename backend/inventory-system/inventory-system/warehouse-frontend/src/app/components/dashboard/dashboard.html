@@ -1,0 +1,123 @@
+<div style="padding:20px;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h1>🏭 Warehouse Dashboard</h1>
+    <div>
+      <span style="margin-right:15px;">Role: <strong>{{role}}</strong></span>
+      <button (click)="logout()" style="padding:8px 16px; background:#dc3545; color:white; border:none; border-radius:4px; cursor:pointer;">Logout</button>
+    </div>
+  </div>
+
+  <div *ngIf="message" style="padding:10px; background:#d4edda; color:#155724; border-radius:4px; margin:10px 0;">{{message}}</div>
+
+  <!-- ADMIN SECTION -->
+  <div *ngIf="role === 'ADMIN'">
+
+    <h2>📦 Inventory Management</h2>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <input [(ngModel)]="newItem.name" placeholder="Item Name" style="padding:8px;">
+      <input [(ngModel)]="newItem.quantity" type="number" placeholder="Quantity" style="padding:8px;">
+      <input [(ngModel)]="newItem.description" placeholder="Description" style="padding:8px;">
+      <button (click)="addItem()" style="padding:8px 16px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;">Add Item</button>
+    </div>
+    <table border="1" style="width:100%; border-collapse:collapse;">
+      <tr style="background:#f8f9fa;">
+        <th style="padding:8px;">ID</th><th style="padding:8px;">Name</th>
+        <th style="padding:8px;">Quantity</th><th style="padding:8px;">Description</th>
+        <th style="padding:8px;">Action</th>
+      </tr>
+      <tr *ngFor="let item of items">
+        <td style="padding:8px;">{{item.id}}</td>
+        <td style="padding:8px;">{{item.name}}</td>
+        <td style="padding:8px;">{{item.quantity}}</td>
+        <td style="padding:8px;">{{item.description}}</td>
+        <td style="padding:8px;">
+          <button (click)="deleteItem(item.id)" style="background:#dc3545; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Delete</button>
+        </td>
+      </tr>
+    </table>
+
+    <h2>🏢 Add Supplier</h2>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <input [(ngModel)]="newSupplier.name" placeholder="Supplier Name" style="padding:8px;">
+      <input [(ngModel)]="newSupplier.contactInfo" placeholder="Contact Info" style="padding:8px;">
+      <input [(ngModel)]="newSupplier.email" placeholder="Email" style="padding:8px;">
+      <button (click)="addSupplier()" style="padding:8px 16px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer;">Add Supplier</button>
+    </div>
+
+    <h2>📋 Create Order</h2>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+      <input [(ngModel)]="newOrder.supplierId" type="number" placeholder="Supplier ID" style="padding:8px;">
+      <input [(ngModel)]="newOrder.orderDate" type="date" style="padding:8px;">
+      <input [(ngModel)]="newOrder.quantity" type="number" placeholder="Quantity" style="padding:8px;">
+      <button (click)="createOrder()" style="padding:8px 16px; background:#17a2b8; color:white; border:none; border-radius:4px; cursor:pointer;">Create Order</button>
+    </div>
+  </div>
+
+  <!-- STAFF SECTION -->
+  <div *ngIf="role === 'STAFF'">
+    <h2>📦 Items</h2>
+    <table border="1" style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+      <tr style="background:#f8f9fa;">
+        <th style="padding:8px;">ID</th><th style="padding:8px;">Name</th>
+        <th style="padding:8px;">Quantity</th><th style="padding:8px;">Description</th>
+      </tr>
+      <tr *ngFor="let item of items">
+        <td style="padding:8px;">{{item.id}}</td>
+        <td style="padding:8px;">{{item.name}}</td>
+        <td style="padding:8px;">{{item.quantity}}</td>
+        <td style="padding:8px;">{{item.description}}</td>
+      </tr>
+    </table>
+
+    <h2>🔄 Update Stock</h2>
+    <div style="display:flex; gap:10px; margin-bottom:20px;">
+      <input [(ngModel)]="stockUpdate.itemId" type="number" placeholder="Item ID" style="padding:8px;">
+      <select [(ngModel)]="stockUpdate.type" style="padding:8px;">
+        <option value="IN">IN</option>
+        <option value="OUT">OUT</option>
+      </select>
+      <input [(ngModel)]="stockUpdate.quantity" type="number" placeholder="Quantity" style="padding:8px;">
+      <button (click)="updateStock()" style="padding:8px 16px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;">Update Stock</button>
+    </div>
+
+    <h2>📊 Stock Movements</h2>
+    <table border="1" style="width:100%; border-collapse:collapse;">
+      <tr style="background:#f8f9fa;">
+        <th style="padding:8px;">ID</th><th style="padding:8px;">Item</th>
+        <th style="padding:8px;">Type</th><th style="padding:8px;">Quantity</th>
+        <th style="padding:8px;">Timestamp</th>
+      </tr>
+      <tr *ngFor="let m of stockMovements">
+        <td style="padding:8px;">{{m.id}}</td>
+        <td style="padding:8px;">{{m.item?.name}}</td>
+        <td style="padding:8px;">{{m.type}}</td>
+        <td style="padding:8px;">{{m.quantity}}</td>
+        <td style="padding:8px;">{{m.timestamp}}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- SUPPLIER SECTION -->
+  <div *ngIf="role === 'SUPPLIER'">
+    <h2>📋 My Orders</h2>
+    <table border="1" style="width:100%; border-collapse:collapse;">
+      <tr style="background:#f8f9fa;">
+        <th style="padding:8px;">ID</th><th style="padding:8px;">Date</th>
+        <th style="padding:8px;">Quantity</th><th style="padding:8px;">Status</th>
+        <th style="padding:8px;">Action</th>
+      </tr>
+      <tr *ngFor="let order of orders">
+        <td style="padding:8px;">{{order.id}}</td>
+        <td style="padding:8px;">{{order.orderDate}}</td>
+        <td style="padding:8px;">{{order.quantity}}</td>
+        <td style="padding:8px;">{{order.status}}</td>
+        <td style="padding:8px;">
+          <button (click)="updateOrderStatus(order.id, 'DELIVERED')"
+            style="background:#28a745; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">
+            Mark Delivered
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

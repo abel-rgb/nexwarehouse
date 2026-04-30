@@ -1,0 +1,20 @@
+<div style="max-width:400px; margin:100px auto; padding:20px; border:1px solid #ccc; border-radius:8px;">
+  <h2>📝 Register</h2>
+  <div *ngIf="message" style="color:green;">{{message}}</div>
+  <input [(ngModel)]="user.username" placeholder="Username"
+    style="width:100%; padding:8px; margin:8px 0;"><br>
+  <input [(ngModel)]="user.password" type="password" placeholder="Password"
+    style="width:100%; padding:8px; margin:8px 0;"><br>
+  <input [(ngModel)]="user.email" placeholder="Email"
+    style="width:100%; padding:8px; margin:8px 0;"><br>
+  <select [(ngModel)]="user.role" style="width:100%; padding:8px; margin:8px 0;">
+    <option value="ADMIN">Admin</option>
+    <option value="STAFF">Staff</option>
+    <option value="SUPPLIER">Supplier</option>
+  </select><br>
+  <button (click)="register()"
+    style="width:100%; padding:10px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer;">
+    Register
+  </button>
+  <p>Already have an account? <a href="/login">Login</a></p>
+</div>

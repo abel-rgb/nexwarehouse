@@ -1,0 +1,24 @@
+# Backend
+backend/inventory-system/inventory-system/target/
+backend/inventory-system/inventory-system/.mvn/
+*.class
+*.jar
+*.war
+
+# Frontend
+warehouse-frontend/node_modules/
+warehouse-frontend/dist/
+warehouse-frontend/.angular/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+*.env
+application-prod.properties

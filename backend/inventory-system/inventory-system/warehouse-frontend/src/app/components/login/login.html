@@ -1,0 +1,15 @@
+    <div style="max-width:400px; margin:100px auto; padding:20px; border:1px solid #ccc; border-radius:8px;">
+  <h2>🏭 Warehouse Login</h2>
+  <div *ngIf="error" style="color:red;">{{error}}</div>
+  <div>
+    <input [(ngModel)]="credentials.username" placeholder="Username"
+      style="width:100%; padding:8px; margin:8px 0;"><br>
+    <input [(ngModel)]="credentials.password" type="password" placeholder="Password"
+      style="width:100%; padding:8px; margin:8px 0;"><br>
+    <button (click)="login()"
+      style="width:100%; padding:10px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;">
+      Login
+    </button>
+  </div>
+  <p>Don't have an account? <a href="/register">Register</a></p>
+</div>

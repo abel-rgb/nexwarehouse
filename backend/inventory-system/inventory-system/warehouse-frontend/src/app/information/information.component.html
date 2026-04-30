@@ -1,0 +1,159 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 22V12h6v10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">NexWarehouse</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a class="nav-item" routerLink="/inventory"><span class="nav-icon">📦</span> Inventory</a>
+        <a class="nav-item" routerLink="/supplier"><span class="nav-icon">🏢</span> Suppliers</a>
+        <a class="nav-item" routerLink="/orders"><span class="nav-icon">📋</span> Orders</a>
+        <a class="nav-item active" routerLink="/information"><span class="nav-icon">📊</span> Information</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Admin</div>
+        <a class="nav-item" routerLink="/users"><span class="nav-icon">👥</span> Users</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()"><span class="nav-icon">🚪</span> Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="page-breadcrumb">Warehouse / <span>Information</span></div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input [(ngModel)]="searchTerm" placeholder="Search suppliers...">
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge role-admin">ADMIN</span>
+        <div class="topbar-btn">🔔</div>
+        <div class="user-avatar">A</div>
+      </div>
+    </header>
+    <div class="content">
+      <div class="page-header animate">
+        <div class="page-title">Supply Chain Information</div>
+        <div class="page-desc">View which suppliers deliver which items and track stock impact</div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="stat-row">
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Total Suppliers</div><div class="stat-icon-box icon-blue">🏢</div></div>
+          <div class="stat-value">{{suppliers.length}}</div>
+          <div class="stat-change">Active partners</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Total Orders</div><div class="stat-icon-box icon-green">📋</div></div>
+          <div class="stat-value">{{orders.length}}</div>
+          <div class="stat-change">All time</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Low Stock Items</div><div class="stat-icon-box icon-amber">⚠️</div></div>
+          <div class="stat-value">{{getLowStockItems().length}}</div>
+          <div class="stat-change down">Need restocking</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Out of Stock</div><div class="stat-icon-box icon-red">🔴</div></div>
+          <div class="stat-value">{{getOutOfStockItems().length}}</div>
+          <div class="stat-change down">Critical</div>
+        </div>
+      </div>
+
+      <!-- Low Stock Alert -->
+      <div class="card animate" *ngIf="getLowStockItems().length > 0 || getOutOfStockItems().length > 0">
+        <div class="card-header"><div class="card-title">⚠️ Stock Alerts</div></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+            <div *ngFor="let item of getLowStockItems()"
+              style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:12px">
+              <div style="font-size:11px;color:#fbbf24;font-weight:600;text-transform:uppercase;margin-bottom:4px">Low Stock</div>
+              <div style="font-weight:600;color:#e2e8f0;font-size:14px">{{item.name}}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:4px">Only {{item.quantity}} units left</div>
+            </div>
+            <div *ngFor="let item of getOutOfStockItems()"
+              style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:12px">
+              <div style="font-size:11px;color:#f87171;font-weight:600;text-transform:uppercase;margin-bottom:4px">Out of Stock</div>
+              <div style="font-weight:600;color:#e2e8f0;font-size:14px">{{item.name}}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:4px">0 units remaining</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supplier → Items Breakdown -->
+      <div *ngFor="let supplier of filteredSuppliers()" class="card animate">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🏢</div>
+            <div>
+              <div class="card-title" style="margin-bottom:2px">{{supplier.name}}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.35)">{{supplier.email}} • {{supplier.contactInfo}}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:700;color:#34d399">{{getSupplierDelivered(supplier.id)}}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.35)">Delivered</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:700;color:#fbbf24">{{getSupplierPending(supplier.id)}}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.35)">Pending</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:700;color:#60a5fa">{{getTotalSupplied(supplier.id)}}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.35)">Units Supplied</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div *ngIf="getSupplierItems(supplier.id).length === 0"
+            style="text-align:center;padding:20px;color:rgba(255,255,255,0.25);font-size:13px">
+            No items linked to this supplier yet.
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"
+            *ngIf="getSupplierItems(supplier.id).length > 0">
+            <div *ngFor="let entry of getSupplierItems(supplier.id)"
+              style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <div style="font-weight:600;color:#e2e8f0;font-size:14px">{{entry.item.name}}</div>
+                <span [class]="entry.item.quantity > 10 ? 'badge badge-green' : entry.item.quantity > 0 ? 'badge badge-amber' : 'badge badge-red'">
+                  {{entry.item.quantity > 10 ? 'In Stock' : entry.item.quantity > 0 ? 'Low' : 'Out'}}
+                </span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+                <div>
+                  <div style="font-size:16px;font-weight:700;color:#60a5fa">{{entry.totalOrdered}}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.3)">Ordered</div>
+                </div>
+                <div>
+                  <div style="font-size:16px;font-weight:700;color:#34d399">{{entry.delivered}}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.3)">Delivered</div>
+                </div>
+                <div>
+                  <div style="font-size:16px;font-weight:700;color:#fbbf24">{{entry.pending}}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.3)">Pending</div>
+                </div>
+              </div>
+              <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05)">
+                <div style="font-size:11px;color:rgba(255,255,255,0.3)">Current Stock</div>
+                <div style="font-size:20px;font-weight:700;color:#fff">{{entry.item.quantity}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

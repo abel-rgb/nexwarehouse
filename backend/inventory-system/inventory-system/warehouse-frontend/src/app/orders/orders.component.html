@@ -1,0 +1,137 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 22V12h6v10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">NexWarehouse</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a class="nav-item" *ngIf="role==='ADMIN'" routerLink="/inventory"><span class="nav-icon">📦</span> Inventory</a>
+        <a class="nav-item" *ngIf="role==='ADMIN'" routerLink="/supplier"><span class="nav-icon">🏢</span> Suppliers</a>
+        <a class="nav-item active" routerLink="/orders"><span class="nav-icon">📋</span> Orders</a>
+        <a class="nav-item" *ngIf="role==='ADMIN'" routerLink="/information"><span class="nav-icon">📊</span> Information</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()"><span class="nav-icon">🚪</span> Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="page-breadcrumb">Warehouse / <span>Orders</span></div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input [(ngModel)]="searchTerm" placeholder="Search orders...">
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span [class]="'role-badge role-' + role.toLowerCase()">{{role}}</span>
+        <div class="topbar-btn">🔔</div>
+        <div class="user-avatar">{{role[0]}}</div>
+      </div>
+    </header>
+    <div class="content">
+      <div class="page-header animate">
+        <div class="page-title">Order Management</div>
+        <div class="page-desc">Track orders — stock updates automatically when order is delivered</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Total Orders</div><div class="stat-icon-box icon-blue">📋</div></div>
+          <div class="stat-value">{{orders.length}}</div>
+          <div class="stat-change">All time</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Pending</div><div class="stat-icon-box icon-amber">⏳</div></div>
+          <div class="stat-value">{{getPending()}}</div>
+          <div class="stat-change down">Awaiting delivery</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Delivered</div><div class="stat-icon-box icon-green">✅</div></div>
+          <div class="stat-value">{{getDelivered()}}</div>
+          <div class="stat-change up">Completed</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Completion Rate</div><div class="stat-icon-box icon-purple">📈</div></div>
+          <div class="stat-value">{{getRate()}}%</div>
+          <div class="stat-change up">Fulfillment</div>
+        </div>
+      </div>
+      <div class="card animate" *ngIf="role === 'ADMIN'">
+        <div class="card-header"><div class="card-title">➕ Create New Order</div></div>
+        <div class="card-body">
+          <div *ngIf="message" class="alert alert-success">{{message}}</div>
+          <div *ngIf="error" class="alert alert-error">❌ {{error}}</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Supplier</label>
+              <select [(ngModel)]="newOrder.supplierId">
+                <option [value]="0" disabled>Select supplier</option>
+                <option *ngFor="let s of suppliers" [value]="s.id">{{s.name}}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Item (optional)</label>
+              <select [(ngModel)]="newOrder.itemId">
+                <option [value]="null">No specific item</option>
+                <option *ngFor="let i of items" [value]="i.id">{{i.name}} (stock: {{i.quantity}})</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Order Date</label><input [(ngModel)]="newOrder.orderDate" type="date"></div>
+            <div class="form-group"><label>Quantity</label><input [(ngModel)]="newOrder.quantity" type="number" placeholder="0"></div>
+            <button class="btn btn-primary" (click)="createOrder()">+ Create Order</button>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.12);border-radius:8px;font-size:12px;color:rgba(255,255,255,0.4);">
+            💡 When you mark an order as <strong style="color:#34d399">Delivered</strong>, the linked item's stock will automatically increase by the order quantity.
+          </div>
+        </div>
+      </div>
+      <div *ngIf="message && role === 'SUPPLIER'" class="alert alert-success animate" style="margin-bottom:16px">{{message}}</div>
+      <div class="card animate">
+        <div class="table-toolbar">
+          <div class="card-title">📋 All Orders</div>
+          <div class="table-search"><span>🔍</span><input [(ngModel)]="searchTerm" placeholder="Filter orders..."></div>
+        </div>
+        <div class="empty-state" *ngIf="filteredOrders().length === 0">
+          <div style="font-size:48px">📋</div>
+          <p>No orders found.</p>
+        </div>
+        <div class="table-wrap" *ngIf="filteredOrders().length > 0">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Supplier</th><th>Item</th><th>Date</th><th>Qty</th><th>Status</th><th *ngIf="role==='SUPPLIER'">Action</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of filteredOrders()">
+                <td style="color:rgba(255,255,255,0.25);font-size:12px">{{order.id}}</td>
+                <td style="font-weight:500;color:#e2e8f0">{{order.supplier?.name || '—'}}</td>
+                <td>
+                  <span *ngIf="order.item" class="badge badge-blue">{{order.item.name}}</span>
+                  <span *ngIf="!order.item" style="color:rgba(255,255,255,0.25)">—</span>
+                </td>
+                <td style="color:rgba(255,255,255,0.5);font-size:12px">{{order.orderDate}}</td>
+                <td>{{order.quantity}}</td>
+                <td>
+                  <span [class]="order.status === 'DELIVERED' ? 'badge badge-green' : 'badge badge-amber'">
+                    {{order.status === 'DELIVERED' ? '✓ Delivered' : '⏳ Pending'}}
+                  </span>
+                </td>
+                <td *ngIf="role === 'SUPPLIER'">
+                  <button *ngIf="order.status !== 'DELIVERED'" class="btn btn-success btn-sm" (click)="markDelivered(order.id)">Mark Delivered</button>
+                  <span *ngIf="order.status === 'DELIVERED'" style="color:#34d399;font-size:12px">✓ Done</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

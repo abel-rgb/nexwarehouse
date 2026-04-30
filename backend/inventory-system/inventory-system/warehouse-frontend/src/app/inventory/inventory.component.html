@@ -1,0 +1,187 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 22V12h6v10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">NexWarehouse</span>
+    </div>
+    <nav class="sidebar-nav">
+  <div class="nav-section">
+    <div class="nav-section-title">Main</div>
+    <a class="nav-item active" routerLink="/inventory"><span class="nav-icon">📦</span> Inventory</a>
+    <a class="nav-item" routerLink="/supplier"><span class="nav-icon">🏢</span> Suppliers</a>
+    <a class="nav-item" routerLink="/orders"><span class="nav-icon">📋</span> Orders</a>
+    <a class="nav-item" routerLink="/information"><span class="nav-icon">📊</span> Information</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Admin</div>
+    <a class="nav-item" routerLink="/users"><span class="nav-icon">👥</span> Users</a>
+  </div>
+</nav>  
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()"><span class="nav-icon">🚪</span> Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="page-breadcrumb">Warehouse / <span>Inventory</span></div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input [(ngModel)]="searchTerm" placeholder="Search items...">
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span [class]="'role-badge role-' + role.toLowerCase()">{{role}}</span>
+
+        <!-- Bell Notification -->
+        <div class="notif-wrap" (click)="toggleNotif()">
+          <div class="topbar-btn" [class.active-btn]="showNotif">
+            🔔
+            <span class="notif-dot" *ngIf="getNotifCount() > 0">{{getNotifCount()}}</span>
+          </div>
+          <div class="notif-dropdown" *ngIf="showNotif">
+            <div class="notif-header">
+              <span>Notifications</span>
+              <span class="notif-count">{{getNotifCount()}} new</span>
+            </div>
+            <div class="notif-item" *ngFor="let n of getNotifications()">
+              <span class="notif-icon">{{n.icon}}</span>
+              <div>
+                <div class="notif-title">{{n.title}}</div>
+                <div class="notif-desc">{{n.desc}}</div>
+              </div>
+            </div>
+            <div class="notif-empty" *ngIf="getNotifCount() === 0">No new notifications</div>
+          </div>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-wrap" (click)="toggleProfile()">
+          <div class="user-avatar">{{role[0]}}</div>
+          <div class="profile-dropdown" *ngIf="showProfile">
+            <div class="profile-header">
+              <div class="profile-avatar">{{role[0]}}</div>
+              <div>
+                <div class="profile-name">{{username}}</div>
+                <div class="profile-role">{{role}}</div>
+              </div>
+            </div>
+            <div class="profile-divider"></div>
+            <div class="profile-item" (click)="goToUsers()">👥 Manage Users</div>
+            <div class="profile-item" (click)="showPasswordModal = true">🔑 Change Password</div>
+            <div class="profile-item" (click)="goToSettings()">⚙️ Settings</div>
+            <div class="profile-divider"></div>
+            <div class="profile-item danger" (click)="logout()">🚪 Sign Out</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" *ngIf="showPasswordModal" (click)="showPasswordModal = false">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <span>Change Password</span>
+          <button class="modal-close" (click)="showPasswordModal = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>New Password</label>
+            <input [(ngModel)]="newPassword" type="password" placeholder="Enter new password">
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-top:12px" (click)="changePassword()">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page-header animate">
+        <div class="page-title">Inventory Management</div>
+        <div class="page-desc">Manage warehouse items, track stock levels and availability</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Total Items</div><div class="stat-icon-box icon-blue">📦</div></div>
+          <div class="stat-value">{{items.length}}</div>
+          <div class="stat-change">Active SKUs</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Total Units</div><div class="stat-icon-box icon-green">🔢</div></div>
+          <div class="stat-value">{{getTotalUnits()}}</div>
+          <div class="stat-change">Across all items</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">Low Stock</div><div class="stat-icon-box icon-red">⚠️</div></div>
+          <div class="stat-value">{{getLowStock()}}</div>
+          <div class="stat-change down">Needs attention</div>
+        </div>
+        <div class="stat-card animate">
+          <div class="stat-top"><div class="stat-label">In Stock</div><div class="stat-icon-box icon-purple">✅</div></div>
+          <div class="stat-value">{{getInStock()}}</div>
+          <div class="stat-change up">Healthy levels</div>
+        </div>
+      </div>
+      <div class="card animate">
+        <div class="card-header"><div class="card-title">➕ Add New Item</div></div>
+        <div class="card-body">
+          <div *ngIf="message" class="alert alert-success">✅ {{message}}</div>
+          <div *ngIf="error" class="alert alert-error">❌ {{error}}</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Item Name</label><input [(ngModel)]="newItem.name" placeholder="e.g. Laptop"></div>
+            <div class="form-group"><label>Quantity</label><input [(ngModel)]="newItem.quantity" type="number" placeholder="0"></div>
+            <div class="form-group"><label>Description</label><input [(ngModel)]="newItem.description" placeholder="Brief description"></div>
+            <button class="btn btn-primary" (click)="addItem()">+ Add Item</button>
+          </div>
+        </div>
+      </div>
+      <div class="card animate">
+        <div class="table-toolbar">
+          <div class="card-title">📋 Item List</div>
+          <div class="table-search"><span>🔍</span><input [(ngModel)]="searchTerm" placeholder="Filter items..."></div>
+        </div>
+        <div class="empty-state" *ngIf="filteredItems().length === 0">
+          <div style="font-size:48px">📦</div>
+          <p>No items found.</p>
+        </div>
+        <div class="table-wrap" *ngIf="filteredItems().length > 0">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Quantity</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let item of filteredItems()">
+                <td style="color:rgba(255,255,255,0.25);font-size:12px">{{item.id}}</td>
+                <td style="font-weight:500;color:#e2e8f0">
+                  <span *ngIf="editingItem?.id !== item.id">{{item.name}}</span>
+                  <input *ngIf="editingItem?.id === item.id" class="edit-input" [(ngModel)]="editingItem.name">
+                </td>
+                <td>
+                  <span *ngIf="editingItem?.id !== item.id"><span [class]="item.quantity > 10 ? 'badge badge-green' : 'badge badge-red'">{{item.quantity}}</span></span>
+                  <input *ngIf="editingItem?.id === item.id" class="edit-input" [(ngModel)]="editingItem.quantity" type="number" style="width:80px">
+                </td>
+                <td>
+                  <span *ngIf="editingItem?.id !== item.id">{{item.description || '—'}}</span>
+                  <input *ngIf="editingItem?.id === item.id" class="edit-input" [(ngModel)]="editingItem.description">
+                </td>
+                <td><span [class]="item.quantity > 10 ? 'badge badge-green' : item.quantity > 0 ? 'badge badge-amber' : 'badge badge-red'">{{item.quantity > 10 ? 'In Stock' : item.quantity > 0 ? 'Low Stock' : 'Out of Stock'}}</span></td>
+                <td>
+                  <div style="display:flex;gap:6px" *ngIf="editingItem?.id !== item.id">
+                    <button class="btn btn-ghost btn-sm" (click)="startEdit(item)">✏️ Edit</button>
+                    <button class="btn btn-danger btn-sm" (click)="deleteItem(item.id)">🗑️</button>
+                  </div>
+                  <div style="display:flex;gap:6px" *ngIf="editingItem?.id === item.id">
+                    <button class="btn btn-success btn-sm" (click)="saveEdit()">✓ Save</button>
+                    <button class="btn btn-ghost btn-sm" (click)="cancelEdit()">✕</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<div class="page">
+  <div class="left-panel">
+    <div class="brand">
+      <div class="logo-box">W</div>
+      <span class="brand-name">WarehouseOS</span>
+    </div>
+    <div class="tagline">
+      <h1>Smart <span>Warehouse</span><br>Management</h1>
+      <p>Streamline your inventory, orders, and supplier coordination in one place.</p>
+    </div>
+    <div class="features">
+      <div class="feature"><span class="feature-icon">📦</span><span class="feature-text">Real-time inventory tracking</span></div>
+      <div class="feature"><span class="feature-icon">🚚</span><span class="feature-text">Supplier coordination</span></div>
+      <div class="feature"><span class="feature-icon">📊</span><span class="feature-text">Stock movement analytics</span></div>
+      <div class="feature"><span class="feature-icon">🔐</span><span class="feature-text">Role-based access control</span></div>
+    </div>
+  </div>
+  <div class="right-panel">
+    <div class="form-box">
+      <h2>Sign in</h2>
+      <p class="sub">Enter your credentials to access your workspace</p>
+      <div *ngIf="error" class="error-msg">{{error}}</div>
+      <div class="field">
+        <label>Username</label>
+        <input [(ngModel)]="credentials.username" type="text" placeholder="Enter your username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input [(ngModel)]="credentials.password" type="password" placeholder="Enter your password">
+      </div>
+      <button class="btn-login" (click)="login()">Sign In</button>
+      <p class="switch" style="margin-top:24px">Don't have an account? <a routerLink="/registration">Register here</a></p>
+    </div>
+  </div>
+</div>
