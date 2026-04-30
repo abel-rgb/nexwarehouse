@@ -1,14 +1,15 @@
 # Backend
 backend/inventory-system/inventory-system/target/
-backend/inventory-system/inventory-system/.mvn/
 *.class
 *.jar
 *.war
+*.exe
+*.msi
 
 # Frontend
-warehouse-frontend/node_modules/
-warehouse-frontend/dist/
-warehouse-frontend/.angular/
+backend/inventory-system/inventory-system/warehouse-frontend/node_modules/
+backend/inventory-system/inventory-system/warehouse-frontend/dist/
+backend/inventory-system/inventory-system/warehouse-frontend/.angular/
 
 # IDE
 .vscode/
@@ -19,6 +20,5 @@ warehouse-frontend/.angular/
 .DS_Store
 Thumbs.db
 
-# Env
-*.env
-application-prod.properties
+# Empty folders
+frontend/
