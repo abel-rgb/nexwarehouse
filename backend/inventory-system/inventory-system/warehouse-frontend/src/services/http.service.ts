@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class HttpService {
-  private baseUrl = 'http://localhost:8081';
+  private baseUrl = 'https://nexwarehouse.up.railway.app';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
