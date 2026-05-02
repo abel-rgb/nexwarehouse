@@ -103,6 +103,8 @@ CREATE DATABASE warehousedb;
 ## 📸 Screenshots
 
 > Login Page, Inventory Dashboard, Stock Management, Order Management, Information Page
+> <img width="1892" height="990" alt="image" src="https://github.com/user-attachments/assets/7fa9b2f8-a81c-4b42-8eb1-e191c2efe12e" />
+
 
 ## 📄 License
 
